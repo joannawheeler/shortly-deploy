@@ -3,6 +3,13 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
+      options: {
+        separator: ';'
+      },
+      dist: {
+        src: ['public/client/*.js'],
+        dest: 'public/dist/shortly-deploy.js'
+      }
     },
 
     mochaTest: {
@@ -21,15 +28,30 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      dist: {
+        files: {
+          'public/dist/shortly-deploy.min.js': ['public/dist/shortly-deploy.js']
+        }
+      }
     },
 
     eslint: {
+      // options: {
+      //   config:'eslint-config-hackreactor',
+      //   reset: true
+      // },
       target: [
         // Add list of files to lint here
+        'public/client/*.js', 'app/**/*.js', 'server-config.js', 'server.js'
       ]
     },
 
     cssmin: {
+      target: {
+        files: {
+          'public/dist/style.min.css': ['public/style.css']
+        }
+      }
     },
 
     watch: {
@@ -51,6 +73,7 @@ module.exports = function(grunt) {
 
     shell: {
       prodServer: {
+        command: 'git push live master'
       }
     },
   });
@@ -72,6 +95,12 @@ module.exports = function(grunt) {
   // Main grunt tasks
   ////////////////////////////////////////////////////
 
+  grunt.registerTask('push', ['shell:prodServer']);
+  grunt.registerTask('concatIt', ['concat']);
+  grunt.registerTask('uglifyJS', ['uglify']);
+  grunt.registerTask('uglifyCSS', ['cssmin']);
+  grunt.registerTask('lintIt', ['eslint']);
+
   grunt.registerTask('test', [
     'mochaTest'
   ]);
@@ -87,9 +116,15 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('deploy', [
-    // add your deploy tasks here
-  ]);
+  grunt.registerTask('deploy', function() {
+    if(grunt.option('prod')) {
+      grunt.task.run(['test', 'lintIt', 'concatIt', 'uglifyJS', 'uglifyCSS', 'push']);
+    } else {
+      grunt.task.run(['test', 'lintIt', 'concatIt', 'uglifyJS', 'uglifyCSS', 'server-dev']);
+    }
+  });
 
+
+// ['test', 'lintIt', 'concatIt', 'uglifyJS', 'uglifyCSS', 'server-dev']
 
 };

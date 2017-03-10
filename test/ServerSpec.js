@@ -11,7 +11,7 @@ var Link = require('../app/models/link');
 // NOTE: these tests are designed for mongo!
 /////////////////////////////////////////////////////
 
-xdescribe('', function() {
+describe('', function() {
 
   beforeEach(function(done) {
     // Log out currently signed in user
@@ -52,7 +52,7 @@ xdescribe('', function() {
             expect(res.body.code).to.be.ok;
           })
           .end(done);
-      });
+      }).timeout(5000);
 
       it('New links create a database entry', function(done) {
         request(app)
