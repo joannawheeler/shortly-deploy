@@ -15,7 +15,7 @@ var User = mongoose.model('User', userSchema);
 
 User.prototype.comparePassword = function(attemptedPassword) {
   return bcrypt.compareSync(attemptedPassword, this.password);
-}
+};
 
 module.exports = User;
 
